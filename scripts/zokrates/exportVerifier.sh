@@ -23,7 +23,6 @@ if [[ -z "${NO_EXPORT}" ]]; then
   cp ${DIST}/${CIRCUIT}.vkey.gz ${BUILD}
   gunzip ${BUILD}/${CIRCUIT}.vkey.gz
   zokrates export-verifier -i "${BUILD}/${CIRCUIT}.vkey" -o "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
-  sed -i '' "s/Verifier/${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
-  sed -i '' "s/Pairing/${CIRCUIT}Pairing/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
+  sed -i '' "s/contract Verifier/contract ${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
   rm ${BUILD}/${CIRCUIT}.vkey
 fi
