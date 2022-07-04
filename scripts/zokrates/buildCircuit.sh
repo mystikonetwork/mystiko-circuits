@@ -24,8 +24,7 @@ zokrates setup -i "${BUILD}/${CIRCUIT}.program" -p "${BUILD}/${CIRCUIT}.pkey" -v
 if [[ -z "${NO_EXPORT}" ]]; then
   mkdir -p "${BUILD}/contracts/verifiers"
   zokrates export-verifier -i "${BUILD}/${CIRCUIT}.vkey" -o "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
-  sed -i '' "s/Verifier/${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
-  sed -i '' "s/Pairing/${CIRCUIT}Pairing/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
+  sed -i '' "s/contract Verifier/contract ${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
 
   cp "${BUILD}/${CIRCUIT}.program" "${DIST}/${CIRCUIT}.program"
   cp "${BUILD}/${CIRCUIT}.pkey" "${DIST}/${CIRCUIT}.pkey"
