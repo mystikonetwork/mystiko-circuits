@@ -24,7 +24,11 @@ zokrates setup -i "${BUILD}/${CIRCUIT}.program" -p "${BUILD}/${CIRCUIT}.pkey" -v
 if [[ -z "${NO_EXPORT}" ]]; then
   mkdir -p "${BUILD}/contracts/verifiers"
   zokrates export-verifier -i "${BUILD}/${CIRCUIT}.vkey" -o "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
-  sed -i '' "s/contract Verifier/contract ${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/contract Verifier/contract ${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
+  else
+    sed -i -e "s/contract Verifier/contract ${CIRCUIT}Verifier/g" "${BUILD}/contracts/verifiers/${CIRCUIT}Verifier.sol"
+  fi
 
   cp "${BUILD}/${CIRCUIT}.program" "${DIST}/${CIRCUIT}.program"
   cp "${BUILD}/${CIRCUIT}.pkey" "${DIST}/${CIRCUIT}.pkey"

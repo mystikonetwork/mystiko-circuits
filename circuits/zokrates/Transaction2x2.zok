@@ -1,29 +1,33 @@
 import "./JoinSplit.zok" as JoinSplit
 
+const u32 TREE_HEIGHT = 20
+const u32 NUM_INPUTS = 2
+const u32 NUM_OUTPUTS = 2
+
 def main(\
   field root, \
-  field[2] serialNumbers, \
-  field[2] sigHashes, \
+  field[NUM_INPUTS] serialNumbers, \
+  field[NUM_INPUTS] sigHashes, \
   field sigPublicKey, \
   field publicAmount, \
   field relayerFeeAmount, \
-  field[2] outCommitments, \
-  field[2] rollupFeeAmounts, \
-  private field[2] inCommitments, \
-  private field[2] inAmount, \
-  private field[2] inRandomP, \
-  private field[2] inRandomR, \
-  private field[2] inRandomS, \
-  private field[2] inSecretKey, \
-  private field[2] inPublicKey, \
-  private field[2][20] inPathElements, \
-  private bool[2][20] inPathIndices, \
-  private field[2] outAmount, \
-  private field[2] outRandomP, \
-  private field[2] outRandomR, \
-  private field[2] outRandomS, \
-  private field[2] outPublicKey):
-  assert(JoinSplit::<20, 2, 2>(\
+  field[NUM_OUTPUTS] outCommitments, \
+  field[NUM_OUTPUTS] rollupFeeAmounts, \
+  private field[NUM_INPUTS] inCommitments, \
+  private field[NUM_INPUTS] inAmount, \
+  private field[NUM_INPUTS] inRandomP, \
+  private field[NUM_INPUTS] inRandomR, \
+  private field[NUM_INPUTS] inRandomS, \
+  private field[NUM_INPUTS] inSecretKey, \
+  private field[NUM_INPUTS] inPublicKey, \
+  private field[NUM_INPUTS][TREE_HEIGHT] inPathElements, \
+  private bool[NUM_INPUTS][TREE_HEIGHT] inPathIndices, \
+  private field[NUM_OUTPUTS] outAmount, \
+  private field[NUM_OUTPUTS] outRandomP, \
+  private field[NUM_OUTPUTS] outRandomR, \
+  private field[NUM_OUTPUTS] outRandomS, \
+  private field[NUM_OUTPUTS] outPublicKey):
+  assert(JoinSplit::<TREE_HEIGHT, NUM_INPUTS, NUM_OUTPUTS>(\
     root, \
     serialNumbers, \
     sigHashes, \

@@ -1,5 +1,6 @@
 import "hashes/poseidon/poseidon" as poseidon
 
 def main(field secretKey, private field randomP) -> field:
+  // calculate nullifier key, nullifier key can be used as a part of the viewing key
   field nk = poseidon([secretKey])
   return poseidon([randomP, nk])

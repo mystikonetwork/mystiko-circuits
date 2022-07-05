@@ -1,12 +1,20 @@
 import "hashes/poseidon/poseidon" as poseidon
 
 def main<N, H>(field[N] leaves) -> field:
+  assert(H <= 30)
   assert(N == (1 << H))
-  field[H + 1][N] layers = [[0; N]; H + 1]
-  layers[0] = leaves
+  u32 treeSize = 2 * N - 1
+  field[treeSize] layers = [0; treeSize]
+  for u32 i in 0..N do
+    layers[i] = leaves[i]
+  endfor
+  u32 pointer = N
+  u32 lastLevelStart = 0
   for u32 i in 1..(H + 1) do
     for u32 j in 0..(1 << (H - i)) do
-      layers[i][j] = poseidon([layers[i - 1][2 * j], layers[i - 1][2 * j + 1]])
+      layers[pointer] = poseidon([layers[lastLevelStart + 2 * j], layers[lastLevelStart + 2 * j + 1]])
+      pointer = pointer + 1
     endfor
+    lastLevelStart = lastLevelStart + (1 << (H - i + 1))
   endfor
-  return layers[H][0]
+  return layers[treeSize - 1]
