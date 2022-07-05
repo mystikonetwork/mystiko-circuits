@@ -7,6 +7,7 @@ import "./SignatureHash.zok" as signatureHasher
 import "./Ownership.zok" as ownershipChecker
 import "./MerkleTree.zok" as merkleTreeRootHasher
 
+// The max value of a field is P - 1, in which P is the prime number.
 const field FIELD_MAX = 21888242871839275222246405745257275088548364400416034343698204186575808495616
 
 def checkCommitments<N>(\
