@@ -1,10 +1,13 @@
 from "ecc/babyjubjubParams" import main as buildOwnershipParams
 from "ecc/babyjubjubParams" import BabyJubJubParams
+import "utils/casts/u32_to_field" as u32ToField
 import "./Commitment.zok" as CommitmentHasher
 import "./SerialNumber.zok" as SerialNumberHasher
 import "./SignatureHash.zok" as signatureHasher
 import "./Ownership.zok" as ownershipChecker
 import "./MerkleTree.zok" as merkleTreeRootHasher
+
+const field FIELD_MAX = 21888242871839275222246405745257275088548364400416034343698204186575808495616
 
 def checkCommitments<N>(\
   field[N] commitments, \
@@ -45,8 +48,8 @@ def checkSignatureHash<N>(\
   return true
 
 def checkOwnerships<N>(\
-  field[N] secretKeys, \
   field[N] publicKeys, \
+  field[N] secretKeys, \
   BabyJubJubParams context) -> bool:
   for u32 i in 0..N do
     bool match = ownershipChecker(publicKeys[i], secretKeys[i], context)
@@ -72,13 +75,16 @@ def checkInAndOutAmounts<I, O>(\
   field publicAmount, \
   field relayerFeeAmount) -> bool:
   field inTotal = 0
+  field inAmountMax = FIELD_MAX / u32ToField(I)
   for u32 i in 0..I do
-    assert(inAmount[i] > 0)
+    assert(inAmount[i] != 0 && inAmount[i] <= inAmountMax)
     inTotal = inTotal + inAmount[i]
   endfor
+  field outAmountMax = FIELD_MAX / u32ToField(2 * O + 2)
+  assert(publicAmount <= outAmountMax && relayerFeeAmount <= outAmountMax)
   field outTotal = 0
   for u32 i in 0..O do
-    assert(outAmount[i] > 0)
+    assert(outAmount[i] != 0 && outAmount[i] <= outAmountMax && rollupFeeAmounts[i] <= outAmountMax)
     outTotal = outTotal + outAmount[i] + rollupFeeAmounts[i]
   endfor
   outTotal = outTotal + publicAmount + relayerFeeAmount
@@ -109,13 +115,14 @@ def main<D, I, O>(\
   private field[O] outRandomS, \
   private field[O] outPublicKey) -> bool:
   BabyJubJubParams ownershipParams = buildOwnershipParams()
+  // Base point from https://eips.ethereum.org/EIPS/eip-2494
   ownershipParams.Gu = 5299619240641551281634865583518297030282874472190772894086521144482721001553
   ownershipParams.Gv = 16950150798460657717958625567821834550301663161624707787222815936182638968203
   assert(checkCommitments(inCommitments, inPublicKey, inAmount, inRandomP, inRandomR, inRandomS))
   assert(checkCommitments(outCommitments, outPublicKey, outAmount, outRandomP, outRandomR, outRandomS))
   assert(checkSerialNumbers(serialNumbers, inRandomP, inSecretKey))
   assert(checkSignatureHash(sigPublicKey, sigHashes, inSecretKey))
-  assert(checkOwnerships(inSecretKey, inPublicKey, ownershipParams))
+  assert(checkOwnerships(inPublicKey, inSecretKey, ownershipParams))
   assert(checkMerklePaths(root, inCommitments, inPathElements, inPathIndices))
   assert(checkInAndOutAmounts(inAmount, outAmount, rollupFeeAmounts, publicAmount, relayerFeeAmount))
   return true

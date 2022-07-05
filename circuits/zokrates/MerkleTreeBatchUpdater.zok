@@ -2,6 +2,7 @@ import "./KeccakBatch.zok" as LeavesHasher
 import "./MerkleTreeBuilder.zok" as MerkleTree
 import "./MerkleTreeUpdater.zok" as MerkleTreeUpdater
 
+// This first zero is computed from keccak256("Welcome To Mystiko's Magic World!") % FIELD_LIMIT
 const field[32] defaultZeros = [\
   4506069241680023110764189603658664710592327039412547147745745078424755206435,
   11970986605677607431310473423176184560047228481560615908426980545799110088554,

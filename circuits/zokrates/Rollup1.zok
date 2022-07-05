@@ -1,5 +1,9 @@
 import "./MerkleTreeBatchUpdater.zok" as MerkleTreeBatchUpdater
 
+const u32 TREE_HEIGHT = 20
+const u32 ROLLUP_HEIGHT = 20
+const u32 ROLLUP_SIZE = 1
+
 def main(\
   field oldRoot, \
   field newRoot, \
@@ -7,7 +11,7 @@ def main(\
   field pathIndices, \
   private field[20] pathElements, \
   private field[1] leaves):
-  assert(MerkleTreeBatchUpdater::<20, 20, 1>(\
+  assert(MerkleTreeBatchUpdater::<TREE_HEIGHT, ROLLUP_HEIGHT, ROLLUP_SIZE>(\
     oldRoot, \
     newRoot, \
     leavesHash, \
