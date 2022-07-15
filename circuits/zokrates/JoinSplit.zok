@@ -7,8 +7,8 @@ import "./SignatureHash.zok" as signatureHasher
 import "./Ownership.zok" as ownershipChecker
 import "./MerkleTree.zok" as merkleTreeRootHasher
 
-// The max value of a field is P - 1, in which P is the prime number.
-const field FIELD_MAX = 21888242871839275222246405745257275088548364400416034343698204186575808495616
+// The max value of input/output/fee amount value: 2^224
+const field AMOUNT_MAX = 26959946667150639794667015087019630673637144422540572481103610249216
 
 def checkCommitments<N>(\
   field[N] commitments, \
@@ -76,16 +76,14 @@ def checkInAndOutAmounts<I, O>(\
   field publicAmount, \
   field relayerFeeAmount) -> bool:
   field inTotal = 0
-  field inAmountMax = FIELD_MAX / u32ToField(I)
   for u32 i in 0..I do
-    assert(inAmount[i] != 0 && inAmount[i] <= inAmountMax)
+    assert(inAmount[i] != 0 && inAmount[i] <= AMOUNT_MAX)
     inTotal = inTotal + inAmount[i]
   endfor
-  field outAmountMax = FIELD_MAX / u32ToField(2 * O + 2)
-  assert(publicAmount <= outAmountMax && relayerFeeAmount <= outAmountMax)
+  assert(publicAmount <= AMOUNT_MAX && relayerFeeAmount <= AMOUNT_MAX)
   field outTotal = 0
   for u32 i in 0..O do
-    assert(outAmount[i] != 0 && outAmount[i] <= outAmountMax && rollupFeeAmounts[i] <= outAmountMax)
+    assert(outAmount[i] != 0 && outAmount[i] <= AMOUNT_MAX && rollupFeeAmounts[i] <= AMOUNT_MAX)
     outTotal = outTotal + outAmount[i] + rollupFeeAmounts[i]
   endfor
   outTotal = outTotal + publicAmount + relayerFeeAmount
