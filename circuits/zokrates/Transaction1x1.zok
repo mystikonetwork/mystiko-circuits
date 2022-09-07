@@ -1,8 +1,8 @@
-import "./JoinSplit.zok" as JoinSplit
+import "./JoinSplit.zok" as JoinSplit;
 
-const u32 TREE_HEIGHT = 20
-const u32 NUM_INPUTS = 1
-const u32 NUM_OUTPUTS = 1
+const u32 TREE_HEIGHT = 20;
+const u32 NUM_INPUTS = 1;
+const u32 NUM_OUTPUTS = 1;
 
 def main(\
   field root, \
@@ -26,7 +26,7 @@ def main(\
   private field[NUM_OUTPUTS] outRandomP, \
   private field[NUM_OUTPUTS] outRandomR, \
   private field[NUM_OUTPUTS] outRandomS, \
-  private field[NUM_OUTPUTS] outPublicKey):
+  private field[NUM_OUTPUTS] outPublicKey) {
   assert(JoinSplit::<TREE_HEIGHT, NUM_INPUTS, NUM_OUTPUTS>(\
     root, \
     serialNumbers, \
@@ -49,5 +49,6 @@ def main(\
     outRandomP, \
     outRandomR, \
     outRandomS, \
-    outPublicKey))
-  return
+    outPublicKey));
+  return;
+}

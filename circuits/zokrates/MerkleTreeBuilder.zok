@@ -1,20 +1,21 @@
-import "hashes/poseidon/poseidon" as poseidon
+import "hashes/poseidon/poseidon" as poseidon;
 
-def main<N, H>(field[N] leaves) -> field:
-  assert(H <= 30)
-  assert(N == (1 << H))
-  u32 treeSize = 2 * N - 1
-  field[treeSize] layers = [0; treeSize]
-  for u32 i in 0..N do
-    layers[i] = leaves[i]
-  endfor
-  u32 pointer = N
-  u32 lastLevelStart = 0
-  for u32 i in 1..(H + 1) do
-    for u32 j in 0..(1 << (H - i)) do
-      layers[pointer] = poseidon([layers[lastLevelStart + 2 * j], layers[lastLevelStart + 2 * j + 1]])
-      pointer = pointer + 1
-    endfor
-    lastLevelStart = lastLevelStart + (1 << (H - i + 1))
-  endfor
-  return layers[treeSize - 1]
+def main<N, H>(field[N] leaves) -> field {
+  assert(H <= 30);
+  assert(N == (1 << H));
+  u32 treeSize = 2 * N - 1;
+  field[treeSize] mut layers = [0; treeSize];
+  for u32 i in 0..N {
+    layers[i] = leaves[i];
+  }
+  u32 mut pointer = N;
+  u32 mut lastLevelStart = 0;
+  for u32 i in 1..(H + 1) {
+    for u32 j in 0..(1 << (H - i)) {
+      layers[pointer] = poseidon([layers[lastLevelStart + 2 * j], layers[lastLevelStart + 2 * j + 1]]);
+      pointer = pointer + 1;
+    }
+    lastLevelStart = lastLevelStart + (1 << (H - i + 1));
+  }
+  return layers[treeSize - 1];
+}

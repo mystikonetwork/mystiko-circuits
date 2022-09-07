@@ -1,6 +1,6 @@
-import "./KeccakBatch.zok" as LeavesHasher
-import "./MerkleTreeBuilder.zok" as MerkleTree
-import "./MerkleTreeUpdater.zok" as MerkleTreeUpdater
+import "./KeccakBatch.zok" as LeavesHasher;
+import "./MerkleTreeBuilder.zok" as MerkleTree;
+import "./MerkleTreeUpdater.zok" as MerkleTreeUpdater;
 
 // This first zero is computed from keccak256("Welcome To Mystiko's Magic World!") % FIELD_LIMIT
 const field[32] defaultZeros = [\
@@ -36,7 +36,7 @@ const field[32] defaultZeros = [\
   16704502504460675449846784815849025989402638612907582712659689210169156075769,
   13519934288458064102175830458858015936170401683429767173542225128161091455592,
   13202030544264649816737469308990869537826379298057211734249690002947353708909
-]
+];
 
 def main<H, R, N>(\
   field oldRoot, \
@@ -44,11 +44,11 @@ def main<H, R, N>(\
   field leavesHash, \
   field pathIndices, \
   private field[R] pathElements, \
-  private field[N] leaves) -> bool:
-  u32 batchHeight = H - R
-  assert(N == (1 << batchHeight))
-  assert(leavesHash == LeavesHasher(leaves))
-  field batchRoot = MerkleTree::<N, batchHeight>(leaves)
+  private field[N] leaves) -> bool {
+  u32 batchHeight = H - R;
+  assert(N == (1 << batchHeight));
+  assert(leavesHash == LeavesHasher(leaves));
+  field batchRoot = MerkleTree::<N, batchHeight>(leaves);
   assert(MerkleTreeUpdater::<R>(\
     defaultZeros[batchHeight], \
     oldRoot, \
@@ -56,5 +56,6 @@ def main<H, R, N>(\
     newRoot, \
     pathIndices, \
     pathElements \
-  ))
-  return true
+  ));
+  return true;
+}

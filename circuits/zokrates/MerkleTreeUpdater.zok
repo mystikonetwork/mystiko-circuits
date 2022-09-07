@@ -1,5 +1,5 @@
-import"./MerkleTree.zok" as MerkleTree
-import "utils/pack/bool/unpack.zok" as unpack
+import"./MerkleTree.zok" as MerkleTree;
+import "utils/pack/bool/unpack.zok" as unpack;
 
 def main<D>(\
   field oldLeaf, \
@@ -7,14 +7,15 @@ def main<D>(\
   field newLeaf, \
   field newRoot, \
   field pathIndices, \
-  field[D] pathElements) -> bool:
-  bool[D] pathIndicesUnpacked = unpack::<D>(pathIndices)
-  bool[D] pathIndicesReversed = [false; D]
-  for u32 i in 0..D do
-    pathIndicesReversed[D - i - 1] = pathIndicesUnpacked[i]
-  endfor
-  field calcOldRoot = MerkleTree(oldLeaf, pathIndicesReversed, pathElements)
-  assert(oldRoot == calcOldRoot)
-  field calcNewRoot = MerkleTree(newLeaf, pathIndicesReversed, pathElements)
-  assert(newRoot == calcNewRoot)
-  return true
+  field[D] pathElements) -> bool {
+  bool[D] pathIndicesUnpacked = unpack::<D>(pathIndices);
+  bool[D] mut pathIndicesReversed = [false; D];
+  for u32 i in 0..D {
+    pathIndicesReversed[D - i - 1] = pathIndicesUnpacked[i];
+  }
+  field calcOldRoot = MerkleTree(oldLeaf, pathIndicesReversed, pathElements);
+  assert(oldRoot == calcOldRoot);
+  field calcNewRoot = MerkleTree(newLeaf, pathIndicesReversed, pathElements);
+  assert(newRoot == calcNewRoot);
+  return true;
+}
