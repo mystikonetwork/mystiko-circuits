@@ -57,6 +57,41 @@
       }
     },
     {
+      "name": "secretSharePublicKey",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 2,
+        "type": "field"
+      }
+    },
+    {
+      "name": "auditorPublicKeys",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "array",
+        "components": {
+          "size": 2,
+          "type": "field"
+        }
+      }
+    },
+    {
+      "name": "encryptedCommitmentShares",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 2,
+        "type": "array",
+        "components": {
+          "size": 5,
+          "type": "field"
+        }
+      }
+    },
+    {
       "name": "inCommitments",
       "public": false,
       "type": "array",
@@ -189,7 +224,43 @@
         "size": 0,
         "type": "field"
       }
+    },
+    {
+      "name": "secretShareSecretKey",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "coefficients",
+      "public": false,
+      "type": "array",
+      "components": {
+        "size": 2,
+        "type": "array",
+        "components": {
+          "size": 3,
+          "type": "field"
+        }
+      }
+    },
+    {
+      "name": "commitmentShares",
+      "public": false,
+      "type": "array",
+      "components": {
+        "size": 2,
+        "type": "array",
+        "components": {
+          "size": 5,
+          "type": "field"
+        }
+      }
     }
   ],
-  "outputs": []
+  "output": {
+    "type": "tuple",
+    "components": {
+      "elements": []
+    }
+  }
 }

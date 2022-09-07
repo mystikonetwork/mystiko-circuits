@@ -1,0 +1,24 @@
+from "ecc/babyjubjubParams" import main as buildBabyJubJubParams;
+from "ecc/babyjubjubParams" import BabyJubJubParams;
+import "ecc/edwardsScalarMult" as scalarMult;
+import "hashes/poseidon/poseidon" as poseidon;
+import "utils/pack/bool/unpack256" as unpack256;
+
+def checkEncryption(\
+  field plainMsg, \
+  field encryptedMsg, \
+  field[2] publicKey, \
+  field[2] commonPublicKey, \
+  field commonSecretKey) -> bool {
+  BabyJubJubParams mut babyJubJubParams = buildBabyJubJubParams();
+	// Base point from https://eips.ethereum.org/EIPS/eip-2494
+	babyJubJubParams.Gu = 5299619240641551281634865583518297030282874472190772894086521144482721001553;
+	babyJubJubParams.Gv = 16950150798460657717958625567821834550301663161624707787222815936182638968203;
+	bool[256] commonSecretKeyBits = unpack256(commonSecretKey);
+	field[2] expectedCommonPublicKey = scalarMult(commonSecretKeyBits, [babyJubJubParams.Gu, babyJubJubParams.Gv], babyJubJubParams);
+	assert(commonPublicKey == expectedCommonPublicKey);
+	field[2] k = scalarMult(commonSecretKeyBits, publicKey, babyJubJubParams);
+	field expectedEncryptedMsg = plainMsg + poseidon(k);
+	assert(encryptedMsg == expectedEncryptedMsg);
+	return true;
+}

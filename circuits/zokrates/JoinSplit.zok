@@ -1,14 +1,16 @@
-from "ecc/babyjubjubParams" import main as buildOwnershipParams
-from "ecc/babyjubjubParams" import BabyJubJubParams
-import "utils/casts/u32_to_field" as u32ToField
-import "./Commitment.zok" as CommitmentHasher
-import "./SerialNumber.zok" as SerialNumberHasher
-import "./SignatureHash.zok" as signatureHasher
-import "./Ownership.zok" as ownershipChecker
-import "./MerkleTree.zok" as merkleTreeRootHasher
+from "ecc/babyjubjubParams" import main as buildOwnershipParams;
+from "ecc/babyjubjubParams" import BabyJubJubParams;
+import "utils/casts/u32_to_field" as u32ToField;
+import "./Commitment.zok" as CommitmentHasher;
+import "./SerialNumber.zok" as SerialNumberHasher;
+import "./SignatureHash.zok" as signatureHasher;
+import "./Ownership.zok" as ownershipChecker;
+import "./MerkleTree.zok" as merkleTreeRootHasher;
+import "./SecretSharing.zok" as SecretSharing;
+from "./ECIES.zok" import checkEncryption;
 
 // The max value of input/output/fee amount value: 2^224
-const field AMOUNT_MAX = 26959946667150639794667015087019630673637144422540572481103610249216
+const field AMOUNT_MAX = 26959946667150639794667015087019630673637144422540572481103610249216;
 
 def checkCommitments<N>(\
   field[N] commitments, \
@@ -16,81 +18,113 @@ def checkCommitments<N>(\
   field[N] amounts, \
   field[N] randomPs, \
   field[N] randomRs, \
-  field[N] randomSs) -> bool:
-  for u32 i in 0..N do
+  field[N] randomSs) -> bool {
+  for u32 i in 0..N {
     field commitment = CommitmentHasher(\
       amounts[i], \
       publicKeys[i], \
       randomPs[i], \
       randomRs[i], \
-      randomSs[i])
-    assert(commitments[i] == commitment)
-  endfor
-  return true
+      randomSs[i]);
+    assert(commitments[i] == commitment);
+  }
+  return true;
+}
 
 def checkSerialNumbers<N>(\
   field[N] serialNumbers, \
   field[N] inRandomP, \
-  private field[N] inSecretKey) -> bool:
-  for u32 i in 0..N do
-    field sn = SerialNumberHasher(inSecretKey[i], inRandomP[i])
-    assert(serialNumbers[i] == sn)
-  endfor
-  return true
+  private field[N] inSecretKey) -> bool {
+  for u32 i in 0..N {
+    field sn = SerialNumberHasher(inSecretKey[i], inRandomP[i]);
+    assert(serialNumbers[i] == sn);
+  }
+  return true;
+}
 
 def checkSignatureHash<N>(\
   field sigPublicKey, \
   field[N] sigHashes, \
-  field[N] secretKeys) -> bool:
-  for u32 i in 0..N do
-    field sigHash = signatureHasher(secretKeys[i], sigPublicKey)
-    assert(sigHashes[i] == sigHash)
-  endfor
-  return true
+  field[N] secretKeys) -> bool {
+  for u32 i in 0..N {
+    field sigHash = signatureHasher(secretKeys[i], sigPublicKey);
+    assert(sigHashes[i] == sigHash);
+  }
+  return true;
+}
 
 def checkOwnerships<N>(\
   field[N] publicKeys, \
   field[N] secretKeys, \
-  BabyJubJubParams context) -> bool:
-  for u32 i in 0..N do
-    bool match = ownershipChecker(publicKeys[i], secretKeys[i], context)
-    assert(match)
-  endfor
-  return true
+  BabyJubJubParams context) -> bool {
+  for u32 i in 0..N {
+    bool match = ownershipChecker(publicKeys[i], secretKeys[i], context);
+    assert(match);
+  }
+  return true;
+}
 
 def checkMerklePaths<N, D>(\
   field root, \
   field[N] commitments, \
   field[N][D] pathElements, \
-  bool[N][D] pathIndices) -> bool:
-  for u32 i in 0..N do
-    field expectedRoot = merkleTreeRootHasher(commitments[i], pathIndices[i], pathElements[i])
-    assert(root == expectedRoot)
-  endfor
-  return true
+  bool[N][D] pathIndices) -> bool {
+  for u32 i in 0..N {
+    field expectedRoot = merkleTreeRootHasher(commitments[i], pathIndices[i], pathElements[i]);
+    assert(root == expectedRoot);
+  }
+  return true;
+}
 
 def checkInAndOutAmounts<I, O>(\
   field[I] inAmount, \
   field[O] outAmount, \
   field[O] rollupFeeAmounts, \
   field publicAmount, \
-  field relayerFeeAmount) -> bool:
-  field inTotal = 0
-  for u32 i in 0..I do
-    assert(inAmount[i] != 0 && inAmount[i] <= AMOUNT_MAX)
-    inTotal = inTotal + inAmount[i]
-  endfor
-  assert(publicAmount <= AMOUNT_MAX && relayerFeeAmount <= AMOUNT_MAX)
-  field outTotal = 0
-  for u32 i in 0..O do
-    assert(outAmount[i] != 0 && outAmount[i] <= AMOUNT_MAX && rollupFeeAmounts[i] <= AMOUNT_MAX)
-    outTotal = outTotal + outAmount[i] + rollupFeeAmounts[i]
-  endfor
-  outTotal = outTotal + publicAmount + relayerFeeAmount
-  assert(inTotal == outTotal)
-  return true
+  field relayerFeeAmount) -> bool {
+  field mut inTotal = 0;
+  for u32 i in 0..I {
+    assert(inAmount[i] != 0 && inAmount[i] <= AMOUNT_MAX);
+    inTotal = inTotal + inAmount[i];
+  }
+  assert(publicAmount <= AMOUNT_MAX && relayerFeeAmount <= AMOUNT_MAX);
+  field mut outTotal = 0;
+  for u32 i in 0..O {
+    assert(outAmount[i] != 0 && outAmount[i] <= AMOUNT_MAX && rollupFeeAmounts[i] <= AMOUNT_MAX);
+    outTotal = outTotal + outAmount[i] + rollupFeeAmounts[i];
+  }
+  outTotal = outTotal + publicAmount + relayerFeeAmount;
+  assert(inTotal == outTotal);
+  return true;
+}
 
-def main<D, I, O>(\
+def checkCommitmentShares<I, N, K>(\
+  field[I] inCommitments, \
+  field[I][K] coefficients, \
+  field[I][N] commitmentShares) -> bool {
+  for u32 i in 0..I {
+    assert(inCommitments[i] == coefficients[i][0]);
+    assert(SecretSharing(coefficients[i], commitmentShares[i]));
+  }
+  return true;
+}
+
+def checkCommitmentShareEncryption<I, N>(\
+  field[N][2] auditorPublicKeys, \
+  field secretShareSecretKey, \
+  field[2] secretSharePublicKey, \
+  field[I][N] commitmentShares, \
+  field[I][N] encryptedCommitmentShares) -> bool {
+  for u32 i in 0..I {
+    for u32 j in 0..N {
+      assert(checkEncryption(commitmentShares[i][j], encryptedCommitmentShares[i][j], \
+        auditorPublicKeys[j], secretSharePublicKey, secretShareSecretKey));
+    }
+  }
+  return true;
+}
+
+def main<D, I, O, N, K>(\
   field root, \
   field[I] serialNumbers, \
   field[I] sigHashes, \
@@ -99,6 +133,9 @@ def main<D, I, O>(\
   field relayerFeeAmount, \
   field[O] outCommitments, \
   field[O] rollupFeeAmounts, \
+  field[2] secretSharePublicKey, \
+  field[N][2] auditorPublicKeys, \
+  field[I][N] encryptedCommitmentShares, \
   private field[I] inCommitments, \
   private field[I] inAmount, \
   private field[I] inRandomP, \
@@ -112,16 +149,23 @@ def main<D, I, O>(\
   private field[O] outRandomP, \
   private field[O] outRandomR, \
   private field[O] outRandomS, \
-  private field[O] outPublicKey) -> bool:
-  BabyJubJubParams ownershipParams = buildOwnershipParams()
+  private field[O] outPublicKey, \
+  private field secretShareSecretKey, \
+  private field[I][K] coefficients, \
+  private field[I][N] commitmentShares) -> bool {
+  BabyJubJubParams mut ownershipParams = buildOwnershipParams();
   // Base point from https://eips.ethereum.org/EIPS/eip-2494
-  ownershipParams.Gu = 5299619240641551281634865583518297030282874472190772894086521144482721001553
-  ownershipParams.Gv = 16950150798460657717958625567821834550301663161624707787222815936182638968203
-  assert(checkCommitments(inCommitments, inPublicKey, inAmount, inRandomP, inRandomR, inRandomS))
-  assert(checkCommitments(outCommitments, outPublicKey, outAmount, outRandomP, outRandomR, outRandomS))
-  assert(checkSerialNumbers(serialNumbers, inRandomP, inSecretKey))
-  assert(checkSignatureHash(sigPublicKey, sigHashes, inSecretKey))
-  assert(checkOwnerships(inPublicKey, inSecretKey, ownershipParams))
-  assert(checkMerklePaths(root, inCommitments, inPathElements, inPathIndices))
-  assert(checkInAndOutAmounts(inAmount, outAmount, rollupFeeAmounts, publicAmount, relayerFeeAmount))
-  return true
+  ownershipParams.Gu = 5299619240641551281634865583518297030282874472190772894086521144482721001553;
+  ownershipParams.Gv = 16950150798460657717958625567821834550301663161624707787222815936182638968203;
+  assert(checkCommitments(inCommitments, inPublicKey, inAmount, inRandomP, inRandomR, inRandomS));
+  assert(checkCommitments(outCommitments, outPublicKey, outAmount, outRandomP, outRandomR, outRandomS));
+  assert(checkSerialNumbers(serialNumbers, inRandomP, inSecretKey));
+  assert(checkSignatureHash(sigPublicKey, sigHashes, inSecretKey));
+  assert(checkOwnerships(inPublicKey, inSecretKey, ownershipParams));
+  assert(checkMerklePaths(root, inCommitments, inPathElements, inPathIndices));
+  assert(checkInAndOutAmounts(inAmount, outAmount, rollupFeeAmounts, publicAmount, relayerFeeAmount));
+  assert(checkCommitmentShares(inCommitments, coefficients, commitmentShares));
+  assert(checkCommitmentShareEncryption(auditorPublicKeys, secretShareSecretKey, secretSharePublicKey, \
+    commitmentShares, encryptedCommitmentShares));
+  return true;
+}

@@ -1,8 +1,8 @@
-import "./MerkleTreeBatchUpdater.zok" as MerkleTreeBatchUpdater
+import "./MerkleTreeBatchUpdater.zok" as MerkleTreeBatchUpdater;
 
-const u32 TREE_HEIGHT = 20
-const u32 ROLLUP_HEIGHT = 16
-const u32 ROLLUP_SIZE = 16
+const u32 TREE_HEIGHT = 20;
+const u32 ROLLUP_HEIGHT = 16;
+const u32 ROLLUP_SIZE = 16;
 
 def main(\
   field oldRoot, \
@@ -10,7 +10,7 @@ def main(\
   field leavesHash, \
   field pathIndices, \
   private field[16] pathElements, \
-  private field[16] leaves):
+  private field[16] leaves) {
   assert(MerkleTreeBatchUpdater::<TREE_HEIGHT, ROLLUP_HEIGHT, ROLLUP_SIZE>(\
     oldRoot, \
     newRoot, \
@@ -18,5 +18,6 @@ def main(\
     pathIndices, \
     pathElements, \
     leaves \
-  ))
-  return
+  ));
+  return;
+}

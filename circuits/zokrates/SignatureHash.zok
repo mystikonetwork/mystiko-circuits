@@ -1,4 +1,5 @@
-import "hashes/poseidon/poseidon" as poseidon
+import "hashes/poseidon/poseidon" as poseidon;
 
-def main(field secretKey, field sigPublicKey) -> field:
-  return poseidon([secretKey, sigPublicKey])
+def main(field secretKey, field sigPublicKey) -> field {
+  return poseidon([secretKey, sigPublicKey]);
+}

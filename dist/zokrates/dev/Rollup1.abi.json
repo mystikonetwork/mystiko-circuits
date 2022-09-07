@@ -39,5 +39,10 @@
       }
     }
   ],
-  "outputs": []
+  "output": {
+    "type": "tuple",
+    "components": {
+      "elements": []
+    }
+  }
 }

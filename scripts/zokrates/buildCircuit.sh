@@ -18,8 +18,8 @@ rm -rf "${DIST}/${CIRCUIT}.*"
 mkdir -p "${BUILD}"
 mkdir -p "${DIST}"
 
-zokrates compile -i "${SRC}/${CIRCUIT}.zok" -o "${BUILD}/${CIRCUIT}.program" -s "${BUILD}/${CIRCUIT}.abi.json"
-zokrates setup -i "${BUILD}/${CIRCUIT}.program" -p "${BUILD}/${CIRCUIT}.pkey" -v "${BUILD}/${CIRCUIT}.vkey"
+zokrates compile -i "${SRC}/${CIRCUIT}.zok" -o "${BUILD}/${CIRCUIT}.program" -s "${BUILD}/${CIRCUIT}.abi.json" -r "${BUILD}/${CIRCUIT}.r1cs"
+zokrates setup -i "${BUILD}/${CIRCUIT}.program" -p "${BUILD}/${CIRCUIT}.pkey" -v "${BUILD}/${CIRCUIT}.vkey" -b "bellman"
 
 if [[ -z "${NO_EXPORT}" ]]; then
   mkdir -p "${BUILD}/contracts/verifiers"

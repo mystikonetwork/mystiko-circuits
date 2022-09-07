@@ -1,8 +1,10 @@
-import "./JoinSplit.zok" as JoinSplit
+import "./JoinSplit.zok" as JoinSplit;
 
-const u32 TREE_HEIGHT = 20
-const u32 NUM_INPUTS = 1
-const u32 NUM_OUTPUTS = 0
+const u32 TREE_HEIGHT = 20;
+const u32 NUM_INPUTS = 1;
+const u32 NUM_OUTPUTS = 0;
+const u32 NUM_AUDITORS = 5;
+const u32 NUM_AUDITING_THRESHOLD = 3;
 
 def main(\
   field root, \
@@ -13,6 +15,9 @@ def main(\
   field relayerFeeAmount, \
   field[NUM_OUTPUTS] outCommitments, \
   field[NUM_OUTPUTS] rollupFeeAmounts, \
+  field[2] secretSharePublicKey, \
+  field[NUM_AUDITORS][2] auditorPublicKeys, \
+  field[NUM_INPUTS][NUM_AUDITORS] encryptedCommitmentShares, \
   private field[NUM_INPUTS] inCommitments, \
   private field[NUM_INPUTS] inAmount, \
   private field[NUM_INPUTS] inRandomP, \
@@ -26,8 +31,11 @@ def main(\
   private field[NUM_OUTPUTS] outRandomP, \
   private field[NUM_OUTPUTS] outRandomR, \
   private field[NUM_OUTPUTS] outRandomS, \
-  private field[NUM_OUTPUTS] outPublicKey):
-  assert(JoinSplit::<TREE_HEIGHT, NUM_INPUTS, NUM_OUTPUTS>(\
+  private field[NUM_OUTPUTS] outPublicKey, \
+  private field secretShareSecretKey, \
+  private field[NUM_INPUTS][NUM_AUDITING_THRESHOLD] coefficients, \
+  private field[NUM_INPUTS][NUM_AUDITORS] commitmentShares) {
+  assert(JoinSplit::<TREE_HEIGHT, NUM_INPUTS, NUM_OUTPUTS, NUM_AUDITORS, NUM_AUDITING_THRESHOLD>(\
     root, \
     serialNumbers, \
     sigHashes, \
@@ -36,6 +44,9 @@ def main(\
     relayerFeeAmount, \
     outCommitments, \
     rollupFeeAmounts, \
+    secretSharePublicKey, \
+    auditorPublicKeys, \
+    encryptedCommitmentShares, \
     inCommitments, \
     inAmount, \
     inRandomP, \
@@ -49,5 +60,9 @@ def main(\
     outRandomP, \
     outRandomR, \
     outRandomS, \
-    outPublicKey))
-  return
+    outPublicKey, \
+    secretShareSecretKey, \
+    coefficients, \
+    commitmentShares));
+  return;
+}
