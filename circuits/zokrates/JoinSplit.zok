@@ -118,7 +118,7 @@ def checkCommitmentShareEncryption<I, N>(\
   for u32 i in 0..I {
     for u32 j in 0..N {
       assert(checkEncryption(commitmentShares[i][j], encryptedCommitmentShares[i][j], \
-        auditorPublicKeys[i], secretSharePublicKey, secretShareSecretKey));
+        auditorPublicKeys[j], secretSharePublicKey, secretShareSecretKey));
     }
   }
   return true;
