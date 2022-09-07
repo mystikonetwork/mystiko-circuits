@@ -6,6 +6,8 @@ import "./SerialNumber.zok" as SerialNumberHasher;
 import "./SignatureHash.zok" as signatureHasher;
 import "./Ownership.zok" as ownershipChecker;
 import "./MerkleTree.zok" as merkleTreeRootHasher;
+import "./SecretSharing.zok" as SecretSharing;
+from "./ECIES.zok" import checkEncryption;
 
 // The max value of input/output/fee amount value: 2^224
 const field AMOUNT_MAX = 26959946667150639794667015087019630673637144422540572481103610249216;
@@ -96,7 +98,33 @@ def checkInAndOutAmounts<I, O>(\
   return true;
 }
 
-def main<D, I, O>(\
+def checkCommitmentShares<I, N, K>(\
+  field[I] inCommitments, \
+  field[I][K] coefficients, \
+  field[I][N] commitmentShares) -> bool {
+  for u32 i in 0..I {
+    assert(inCommitments[i] == coefficients[i][0]);
+    assert(SecretSharing(coefficients[i], commitmentShares[i]));
+  }
+  return true;
+}
+
+def checkCommitmentShareEncryption<I, N>(\
+  field[N][2] auditorPublicKeys, \
+  field secretShareSecretKey, \
+  field[2] secretSharePublicKey, \
+  field[I][N] commitmentShares, \
+  field[I][N] encryptedCommitmentShares) -> bool {
+  for u32 i in 0..I {
+    for u32 j in 0..N {
+      assert(checkEncryption(commitmentShares[i][j], encryptedCommitmentShares[i][j], \
+        auditorPublicKeys[i], secretSharePublicKey, secretShareSecretKey));
+    }
+  }
+  return true;
+}
+
+def main<D, I, O, N, K>(\
   field root, \
   field[I] serialNumbers, \
   field[I] sigHashes, \
@@ -105,6 +133,9 @@ def main<D, I, O>(\
   field relayerFeeAmount, \
   field[O] outCommitments, \
   field[O] rollupFeeAmounts, \
+  field[2] secretSharePublicKey, \
+  field[N][2] auditorPublicKeys, \
+  field[I][N] encryptedCommitmentShares, \
   private field[I] inCommitments, \
   private field[I] inAmount, \
   private field[I] inRandomP, \
@@ -118,7 +149,10 @@ def main<D, I, O>(\
   private field[O] outRandomP, \
   private field[O] outRandomR, \
   private field[O] outRandomS, \
-  private field[O] outPublicKey) -> bool {
+  private field[O] outPublicKey, \
+  private field secretShareSecretKey, \
+  private field[I][K] coefficients, \
+  private field[I][N] commitmentShares) -> bool {
   BabyJubJubParams mut ownershipParams = buildOwnershipParams();
   // Base point from https://eips.ethereum.org/EIPS/eip-2494
   ownershipParams.Gu = 5299619240641551281634865583518297030282874472190772894086521144482721001553;
@@ -130,5 +164,8 @@ def main<D, I, O>(\
   assert(checkOwnerships(inPublicKey, inSecretKey, ownershipParams));
   assert(checkMerklePaths(root, inCommitments, inPathElements, inPathIndices));
   assert(checkInAndOutAmounts(inAmount, outAmount, rollupFeeAmounts, publicAmount, relayerFeeAmount));
+  assert(checkCommitmentShares(inCommitments, coefficients, commitmentShares));
+  assert(checkCommitmentShareEncryption(auditorPublicKeys, secretShareSecretKey, secretSharePublicKey, \
+    commitmentShares, encryptedCommitmentShares));
   return true;
 }
