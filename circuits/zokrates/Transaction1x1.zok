@@ -15,7 +15,9 @@ def main(\
   field relayerFeeAmount, \
   field[NUM_OUTPUTS] outCommitments, \
   field[NUM_OUTPUTS] rollupFeeAmounts, \
+  bool randomPublicKeyXSign, \
   field randomPublicKeyY, \
+  bool[NUM_AUDITORS] auditorPublicKeyXSigns, \
   field[NUM_AUDITORS] auditorPublicKeyYs, \
   field[NUM_INPUTS][NUM_AUDITORS] encryptedCommitmentShares, \
   private field[NUM_INPUTS] inCommitments, \
@@ -46,7 +48,9 @@ def main(\
     relayerFeeAmount, \
     outCommitments, \
     rollupFeeAmounts, \
+    randomPublicKeyXSign, \
     randomPublicKeyY, \
+    auditorPublicKeyXSigns, \
     auditorPublicKeyYs, \
     encryptedCommitmentShares, \
     inCommitments, \

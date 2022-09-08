@@ -57,9 +57,23 @@
       }
     },
     {
+      "name": "randomPublicKeyXSign",
+      "public": true,
+      "type": "bool"
+    },
+    {
       "name": "randomPublicKeyY",
       "public": true,
       "type": "field"
+    },
+    {
+      "name": "auditorPublicKeyXSigns",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "bool"
+      }
     },
     {
       "name": "auditorPublicKeyYs",
