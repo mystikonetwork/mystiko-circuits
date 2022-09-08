@@ -1,6 +1,8 @@
 from "ecc/babyjubjubParams" import main as buildOwnershipParams;
 from "ecc/babyjubjubParams" import BabyJubJubParams;
+import "ecc/edwardsOnCurve" as isOnCurve;
 import "utils/casts/u32_to_field" as u32ToField;
+import "utils/pack/bool/nonStrictUnpack256" as unpack256;
 import "./Commitment.zok" as CommitmentHasher;
 import "./SerialNumber.zok" as SerialNumberHasher;
 import "./SignatureHash.zok" as signatureHasher;
@@ -110,15 +112,32 @@ def checkCommitmentShares<I, N, K>(\
 }
 
 def checkCommitmentShareEncryption<I, N>(\
-  field[N][2] auditorPublicKeys, \
-  field secretShareSecretKey, \
-  field[2] secretSharePublicKey, \
+  field[N] auditorPublicKeyXs, \
+  bool[N] auditorPublicKeyXSigns, \
+  field[N] auditorPublicKeyYs, \
+  field randomPublicKeyX, \
+  bool randomPublicKeyXSign, \
+  field randomPublicKeyY, \
+  field randomSecretKey, \
   field[I][N] commitmentShares, \
-  field[I][N] encryptedCommitmentShares) -> bool {
+  field[I][N] encryptedCommitmentShares, \
+  BabyJubJubParams context) -> bool {
+  bool[256] randomPublicKeyXBits = unpack256(randomPublicKeyX);
+  field[2] randomPublicKey = [randomPublicKeyX, randomPublicKeyY];
+  assert(isOnCurve(randomPublicKey, context));
+  assert(randomPublicKeyXBits[255] == randomPublicKeyXSign);
   for u32 i in 0..I {
     for u32 j in 0..N {
-      assert(checkEncryption(commitmentShares[i][j], encryptedCommitmentShares[i][j], \
-        auditorPublicKeys[j], secretSharePublicKey, secretShareSecretKey));
+      bool[256] auditorPublicKeyXBits = unpack256(auditorPublicKeyXs[j]);
+      field[2] auditorPublicKey = [auditorPublicKeyXs[j], auditorPublicKeyYs[j]];
+      assert(isOnCurve(auditorPublicKey, context));
+      assert(auditorPublicKeyXBits[255] == auditorPublicKeyXSigns[j]);
+      assert(checkEncryption(commitmentShares[i][j], \
+        encryptedCommitmentShares[i][j], \
+        auditorPublicKey, \
+        randomPublicKey, \
+        randomSecretKey, \
+        context));
     }
   }
   return true;
@@ -133,8 +152,10 @@ def main<D, I, O, N, K>(\
   field relayerFeeAmount, \
   field[O] outCommitments, \
   field[O] rollupFeeAmounts, \
-  field[2] secretSharePublicKey, \
-  field[N][2] auditorPublicKeys, \
+  bool randomPublicKeyXSign, \
+  field randomPublicKeyY, \
+  bool[N] auditorPublicKeyXSigns, \
+  field[N] auditorPublicKeyYs, \
   field[I][N] encryptedCommitmentShares, \
   private field[I] inCommitments, \
   private field[I] inAmount, \
@@ -150,7 +171,9 @@ def main<D, I, O, N, K>(\
   private field[O] outRandomR, \
   private field[O] outRandomS, \
   private field[O] outPublicKey, \
-  private field secretShareSecretKey, \
+  private field randomPublicKeyX, \
+  private field[N] auditorPublicKeyXs, \
+  private field randomSecretKey, \
   private field[I][K] coefficients, \
   private field[I][N] commitmentShares) -> bool {
   BabyJubJubParams mut ownershipParams = buildOwnershipParams();
@@ -165,7 +188,16 @@ def main<D, I, O, N, K>(\
   assert(checkMerklePaths(root, inCommitments, inPathElements, inPathIndices));
   assert(checkInAndOutAmounts(inAmount, outAmount, rollupFeeAmounts, publicAmount, relayerFeeAmount));
   assert(checkCommitmentShares(inCommitments, coefficients, commitmentShares));
-  assert(checkCommitmentShareEncryption(auditorPublicKeys, secretShareSecretKey, secretSharePublicKey, \
-    commitmentShares, encryptedCommitmentShares));
+  assert(checkCommitmentShareEncryption(\
+    auditorPublicKeyXs, \
+    auditorPublicKeyXSigns, \
+    auditorPublicKeyYs, \
+    randomPublicKeyX, \
+    randomPublicKeyXSign, \
+    randomPublicKeyY, \
+    randomSecretKey, \
+    commitmentShares, \
+    encryptedCommitmentShares, \
+    ownershipParams));
   return true;
 }

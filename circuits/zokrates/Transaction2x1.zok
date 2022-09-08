@@ -15,8 +15,10 @@ def main(\
   field relayerFeeAmount, \
   field[NUM_OUTPUTS] outCommitments, \
   field[NUM_OUTPUTS] rollupFeeAmounts, \
-  field[2] secretSharePublicKey, \
-  field[NUM_AUDITORS][2] auditorPublicKeys, \
+  bool randomPublicKeyXSign, \
+  field randomPublicKeyY, \
+  bool[NUM_AUDITORS] auditorPublicKeyXSigns, \
+  field[NUM_AUDITORS] auditorPublicKeyYs, \
   field[NUM_INPUTS][NUM_AUDITORS] encryptedCommitmentShares, \
   private field[NUM_INPUTS] inCommitments, \
   private field[NUM_INPUTS] inAmount, \
@@ -32,7 +34,9 @@ def main(\
   private field[NUM_OUTPUTS] outRandomR, \
   private field[NUM_OUTPUTS] outRandomS, \
   private field[NUM_OUTPUTS] outPublicKey, \
-  private field secretShareSecretKey, \
+  private field randomPublicKeyX, \
+  private field[NUM_AUDITORS] auditorPublicKeyXs, \
+  private field randomSecretKey, \
   private field[NUM_INPUTS][NUM_AUDITING_THRESHOLD] coefficients, \
   private field[NUM_INPUTS][NUM_AUDITORS] commitmentShares) {
   assert(JoinSplit::<TREE_HEIGHT, NUM_INPUTS, NUM_OUTPUTS, NUM_AUDITORS, NUM_AUDITING_THRESHOLD>(\
@@ -44,8 +48,10 @@ def main(\
     relayerFeeAmount, \
     outCommitments, \
     rollupFeeAmounts, \
-    secretSharePublicKey, \
-    auditorPublicKeys, \
+    randomPublicKeyXSign, \
+    randomPublicKeyY, \
+    auditorPublicKeyXSigns, \
+    auditorPublicKeyYs, \
     encryptedCommitmentShares, \
     inCommitments, \
     inAmount, \
@@ -61,7 +67,9 @@ def main(\
     outRandomR, \
     outRandomS, \
     outPublicKey, \
-    secretShareSecretKey, \
+    randomPublicKeyX, \
+    auditorPublicKeyXs, \
+    randomSecretKey, \
     coefficients, \
     commitmentShares));
   return;

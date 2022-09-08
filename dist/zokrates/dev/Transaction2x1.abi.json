@@ -57,25 +57,31 @@
       }
     },
     {
-      "name": "secretSharePublicKey",
+      "name": "randomPublicKeyXSign",
       "public": true,
-      "type": "array",
-      "components": {
-        "size": 2,
-        "type": "field"
-      }
+      "type": "bool"
     },
     {
-      "name": "auditorPublicKeys",
+      "name": "randomPublicKeyY",
+      "public": true,
+      "type": "field"
+    },
+    {
+      "name": "auditorPublicKeyXSigns",
       "public": true,
       "type": "array",
       "components": {
         "size": 5,
-        "type": "array",
-        "components": {
-          "size": 2,
-          "type": "field"
-        }
+        "type": "bool"
+      }
+    },
+    {
+      "name": "auditorPublicKeyYs",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "field"
       }
     },
     {
@@ -226,7 +232,21 @@
       }
     },
     {
-      "name": "secretShareSecretKey",
+      "name": "randomPublicKeyX",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "auditorPublicKeyXs",
+      "public": false,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "field"
+      }
+    },
+    {
+      "name": "randomSecretKey",
       "public": false,
       "type": "field"
     },
