@@ -2,7 +2,6 @@ from "ecc/babyjubjubParams" import main as buildOwnershipParams;
 from "ecc/babyjubjubParams" import BabyJubJubParams;
 import "ecc/edwardsOnCurve" as isOnCurve;
 import "utils/casts/u32_to_field" as u32ToField;
-import "utils/pack/bool/nonStrictUnpack256" as unpack256;
 import "./Commitment.zok" as CommitmentHasher;
 import "./SerialNumber.zok" as SerialNumberHasher;
 import "./SignatureHash.zok" as signatureHasher;
@@ -13,6 +12,9 @@ from "./ECIES.zok" import checkEncryption;
 
 // The max value of input/output/fee amount value: 2^224
 const field AMOUNT_MAX = 26959946667150639794667015087019630673637144422540572481103610249216;
+
+// The half of the upper bound of field
+const field HALF_FIELD = 10944121435919637611123202872628637544274182200208017171849102093287904247808;
 
 def checkCommitments<N>(\
   field[N] commitments, \
@@ -122,16 +124,14 @@ def checkCommitmentShareEncryption<I, N>(\
   field[I][N] commitmentShares, \
   field[I][N] encryptedCommitmentShares, \
   BabyJubJubParams context) -> bool {
-  bool[256] randomPublicKeyXBits = unpack256(randomPublicKeyX);
   field[2] randomPublicKey = [randomPublicKeyX, randomPublicKeyY];
   assert(isOnCurve(randomPublicKey, context));
-  assert(randomPublicKeyXBits[255] == randomPublicKeyXSign);
+  assert((randomPublicKeyX > HALF_FIELD) == randomPublicKeyXSign);
   for u32 i in 0..I {
     for u32 j in 0..N {
-      bool[256] auditorPublicKeyXBits = unpack256(auditorPublicKeyXs[j]);
       field[2] auditorPublicKey = [auditorPublicKeyXs[j], auditorPublicKeyYs[j]];
       assert(isOnCurve(auditorPublicKey, context));
-      assert(auditorPublicKeyXBits[255] == auditorPublicKeyXSigns[j]);
+      assert((auditorPublicKeyXs[j] > HALF_FIELD) == auditorPublicKeyXSigns[j]);
       assert(checkEncryption(commitmentShares[i][j], \
         encryptedCommitmentShares[i][j], \
         auditorPublicKey, \
