@@ -57,25 +57,17 @@
       }
     },
     {
-      "name": "secretSharePublicKey",
+      "name": "randomPublicKeyY",
       "public": true,
-      "type": "array",
-      "components": {
-        "size": 2,
-        "type": "field"
-      }
+      "type": "field"
     },
     {
-      "name": "auditorPublicKeys",
+      "name": "auditorPublicKeyYs",
       "public": true,
       "type": "array",
       "components": {
         "size": 5,
-        "type": "array",
-        "components": {
-          "size": 2,
-          "type": "field"
-        }
+        "type": "field"
       }
     },
     {
@@ -226,7 +218,21 @@
       }
     },
     {
-      "name": "secretShareSecretKey",
+      "name": "randomPublicKeyX",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "auditorPublicKeyXs",
+      "public": false,
+      "type": "array",
+      "components": {
+        "size": 5,
+        "type": "field"
+      }
+    },
+    {
+      "name": "randomSecretKey",
       "public": false,
       "type": "field"
     },
