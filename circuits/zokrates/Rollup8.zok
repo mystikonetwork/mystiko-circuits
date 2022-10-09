@@ -1,8 +1,8 @@
 import "./MerkleTreeBatchUpdater.zok" as MerkleTreeBatchUpdater;
 
 const u32 TREE_HEIGHT = 20;
-const u32 ROLLUP_HEIGHT = 12;
-const u32 ROLLUP_SIZE = 256;
+const u32 ROLLUP_HEIGHT = 17;
+const u32 ROLLUP_SIZE = 8;
 
 def main(\
   field oldRoot, \

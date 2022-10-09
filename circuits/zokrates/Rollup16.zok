@@ -9,8 +9,8 @@ def main(\
   field newRoot, \
   field leavesHash, \
   field pathIndices, \
-  private field[16] pathElements, \
-  private field[16] leaves) {
+  private field[ROLLUP_HEIGHT] pathElements, \
+  private field[ROLLUP_SIZE] leaves) {
   assert(MerkleTreeBatchUpdater::<TREE_HEIGHT, ROLLUP_HEIGHT, ROLLUP_SIZE>(\
     oldRoot, \
     newRoot, \

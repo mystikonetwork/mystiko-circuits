@@ -12,5 +12,7 @@ bash "${BUILDER}" Transaction2x0
 bash "${BUILDER}" Transaction2x1
 bash "${BUILDER}" Transaction2x2
 bash "${BUILDER}" Rollup1
+bash "${BUILDER}" Rollup2
 bash "${BUILDER}" Rollup4
+bash "${BUILDER}" Rollup8
 bash "${BUILDER}" Rollup16
