@@ -6,11 +6,15 @@ if [ "$#" -lt 1 ]; then
   exit 1
 fi
 
+if [[ -z "${MODE}" ]]; then
+  MODE="dev"
+fi
+
 BASE=$(cd "$(dirname "$0")";pwd)
 ROOT="${BASE}/../.."
 BUILD="${ROOT}/build/zokrates"
 SRC="${ROOT}/circuits/zokrates"
-DIST="${ROOT}/dist/zokrates/dev"
+DIST="${ROOT}/dist/zokrates/${MODE}"
 CIRCUIT="$1"
 
 rm -rf "${BUILD}/${CIRCUIT}.*"
