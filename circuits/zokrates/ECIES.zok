@@ -3,17 +3,23 @@ import "ecc/edwardsScalarMult" as scalarMult;
 import "hashes/poseidon/poseidon" as poseidon;
 import "utils/pack/bool/unpack256" as unpack256;
 
+def unpackEphemeralScalar(\
+  field[2] ephemeralPoint, \
+  field ephemeralScalar, \
+  BabyJubJubParams context) -> bool[256] {
+	bool[256] ephemeralScalarBits = unpack256(ephemeralScalar);
+	field[2] expectedEphemeralPoint = scalarMult(ephemeralScalarBits, [context.Gu, context.Gv], context);
+	assert(ephemeralPoint == expectedEphemeralPoint);
+	return ephemeralScalarBits;
+}
+
 def checkEncryption(\
   field plainMsg, \
   field encryptedMsg, \
   field[2] publicKey, \
-  field[2] commonPublicKey, \
-  field commonSecretKey, \
+  bool[256] ephemeralScalarBits, \
   BabyJubJubParams context) -> bool {
-	bool[256] commonSecretKeyBits = unpack256(commonSecretKey);
-	field[2] expectedCommonPublicKey = scalarMult(commonSecretKeyBits, [context.Gu, context.Gv], context);
-	assert(commonPublicKey == expectedCommonPublicKey);
-	field[2] k = scalarMult(commonSecretKeyBits, publicKey, context);
+	field[2] k = scalarMult(ephemeralScalarBits, publicKey, context);
 	field expectedEncryptedMsg = plainMsg + poseidon(k);
 	assert(encryptedMsg == expectedEncryptedMsg);
 	return true;

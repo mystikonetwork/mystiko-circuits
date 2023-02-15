@@ -8,6 +8,7 @@ import "./SignatureHash.zok" as signatureHasher;
 import "./Ownership.zok" as ownershipChecker;
 import "./MerkleTree.zok" as merkleTreeRootHasher;
 import "./SecretSharing.zok" as SecretSharing;
+from "./ECIES.zok" import unpackEphemeralScalar;
 from "./ECIES.zok" import checkEncryption;
 
 // The max value of input/output/fee amount value: 2^224
@@ -127,16 +128,16 @@ def checkCommitmentShareEncryption<I, N>(\
   field[2] randomPublicKey = [randomPublicKeyX, randomPublicKeyY];
   assert(isOnCurve(randomPublicKey, context));
   assert((randomPublicKeyX > HALF_FIELD) == randomPublicKeyXSign);
-  for u32 i in 0..I {
-    for u32 j in 0..N {
-      field[2] auditorPublicKey = [auditorPublicKeyXs[j], auditorPublicKeyYs[j]];
-      assert(isOnCurve(auditorPublicKey, context));
-      assert((auditorPublicKeyXs[j] > HALF_FIELD) == auditorPublicKeyXSigns[j]);
+  bool[256] ephemeralScalarBits = unpackEphemeralScalar(randomPublicKey, randomSecretKey, context);
+  for u32 j in 0..N {
+    field[2] auditorPublicKey = [auditorPublicKeyXs[j], auditorPublicKeyYs[j]];
+    assert(isOnCurve(auditorPublicKey, context));
+    assert((auditorPublicKeyXs[j] > HALF_FIELD) == auditorPublicKeyXSigns[j]);
+    for u32 i in 0..I {
       assert(checkEncryption(commitmentShares[i][j], \
         encryptedCommitmentShares[i][j], \
         auditorPublicKey, \
-        randomPublicKey, \
-        randomSecretKey, \
+        ephemeralScalarBits, \
         context));
     }
   }
