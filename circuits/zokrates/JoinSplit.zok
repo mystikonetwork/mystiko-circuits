@@ -39,7 +39,7 @@ def checkCommitments<N>(\
 def checkSerialNumbers<N>(\
   field[N] serialNumbers, \
   field[N] inRandomP, \
-  private field[N] inSecretKey) -> bool {
+  field[N] inSecretKey) -> bool {
   for u32 i in 0..N {
     field sn = SerialNumberHasher(inSecretKey[i], inRandomP[i]);
     assert(serialNumbers[i] == sn);
@@ -158,25 +158,25 @@ def main<D, I, O, N, K>(\
   bool[N] auditorPublicKeyXSigns, \
   field[N] auditorPublicKeyYs, \
   field[I][N] encryptedCommitmentShares, \
-  private field[I] inCommitments, \
-  private field[I] inAmount, \
-  private field[I] inRandomP, \
-  private field[I] inRandomR, \
-  private field[I] inRandomS, \
-  private field[I] inSecretKey, \
-  private field[I] inPublicKey, \
-  private field[I][D] inPathElements, \
-  private bool[I][D] inPathIndices, \
-  private field[O] outAmount, \
-  private field[O] outRandomP, \
-  private field[O] outRandomR, \
-  private field[O] outRandomS, \
-  private field[O] outPublicKey, \
-  private field randomPublicKeyX, \
-  private field[N] auditorPublicKeyXs, \
-  private field randomSecretKey, \
-  private field[I][K] coefficients, \
-  private field[I][N] commitmentShares) -> bool {
+  field[I] inCommitments, \
+  field[I] inAmount, \
+  field[I] inRandomP, \
+  field[I] inRandomR, \
+  field[I] inRandomS, \
+  field[I] inSecretKey, \
+  field[I] inPublicKey, \
+  field[I][D] inPathElements, \
+  bool[I][D] inPathIndices, \
+  field[O] outAmount, \
+  field[O] outRandomP, \
+  field[O] outRandomR, \
+  field[O] outRandomS, \
+  field[O] outPublicKey, \
+  field randomPublicKeyX, \
+  field[N] auditorPublicKeyXs, \
+  field randomSecretKey, \
+  field[I][K] coefficients, \
+  field[I][N] commitmentShares) -> bool {
   BabyJubJubParams mut ownershipParams = buildOwnershipParams();
   // Base point from https://eips.ethereum.org/EIPS/eip-2494
   ownershipParams.Gu = 5299619240641551281634865583518297030282874472190772894086521144482721001553;
