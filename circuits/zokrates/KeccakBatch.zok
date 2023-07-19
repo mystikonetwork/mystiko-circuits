@@ -1,40 +1,124 @@
 import "hashes/keccak/256bit.zok" as keccak;
-import "utils/casts/u64_from_bits.zok" as u64_from_bits;
-import "utils/casts/u64_to_bits.zok" as u64_to_bits;
+import "utils/casts/u8_from_bits.zok" as u8_from_bits;
+import "utils/casts/u8_to_bits.zok" as u8_to_bits;
 import "utils/pack/bool/unpack256.zok" as unpack256;
 import "utils/pack/bool/pack256" as pack256;
 
-def fieldToU64(field value) -> u64[4] {
+def fieldToU8(field value) -> u8[32] {
   bool[256] bits = unpack256(value);
-  u64[4] result = [\
-    u64_from_bits(bits[0..64]),
-    u64_from_bits(bits[64..128]),
-    u64_from_bits(bits[128..192]),
-    u64_from_bits(bits[192..256])
+  u8[32] result = [\
+    u8_from_bits(bits[0..8]),
+    u8_from_bits(bits[8..16]),
+    u8_from_bits(bits[16..24]),
+    u8_from_bits(bits[24..32]),
+    u8_from_bits(bits[32..40]),
+    u8_from_bits(bits[40..48]),
+    u8_from_bits(bits[48..56]),
+    u8_from_bits(bits[56..64]),
+    u8_from_bits(bits[64..72]),
+    u8_from_bits(bits[72..80]),
+    u8_from_bits(bits[80..88]),
+    u8_from_bits(bits[88..96]),
+    u8_from_bits(bits[96..104]),
+    u8_from_bits(bits[104..112]),
+    u8_from_bits(bits[112..120]),
+    u8_from_bits(bits[120..128]),
+    u8_from_bits(bits[128..136]),
+    u8_from_bits(bits[136..144]),
+    u8_from_bits(bits[144..152]),
+    u8_from_bits(bits[152..160]),
+    u8_from_bits(bits[160..168]),
+    u8_from_bits(bits[168..176]),
+    u8_from_bits(bits[176..184]),
+    u8_from_bits(bits[184..192]),
+    u8_from_bits(bits[192..200]),
+    u8_from_bits(bits[200..208]),
+    u8_from_bits(bits[208..216]),
+    u8_from_bits(bits[216..224]),
+    u8_from_bits(bits[224..232]),
+    u8_from_bits(bits[232..240]),
+    u8_from_bits(bits[240..248]),
+    u8_from_bits(bits[248..256])
   ];
   return result;
 }
 
-def u64ToField(u64[4] value) -> field {
+def u8ToField(u8[32] value) -> field {
   bool[256] bits = [\
-    ...(u64_to_bits(value[0])),
-    ...(u64_to_bits(value[1])),
-    ...(u64_to_bits(value[2])),
-    ...(u64_to_bits(value[3]))
+    ...(u8_to_bits(value[0])),
+    ...(u8_to_bits(value[1])),
+    ...(u8_to_bits(value[2])),
+    ...(u8_to_bits(value[3])),
+    ...(u8_to_bits(value[4])),
+    ...(u8_to_bits(value[5])),
+    ...(u8_to_bits(value[6])),
+    ...(u8_to_bits(value[7])),
+    ...(u8_to_bits(value[8])),
+    ...(u8_to_bits(value[9])),
+    ...(u8_to_bits(value[10])),
+    ...(u8_to_bits(value[11])),
+    ...(u8_to_bits(value[12])),
+    ...(u8_to_bits(value[13])),
+    ...(u8_to_bits(value[14])),
+    ...(u8_to_bits(value[15])),
+    ...(u8_to_bits(value[16])),
+    ...(u8_to_bits(value[17])),
+    ...(u8_to_bits(value[18])),
+    ...(u8_to_bits(value[19])),
+    ...(u8_to_bits(value[20])),
+    ...(u8_to_bits(value[21])),
+    ...(u8_to_bits(value[22])),
+    ...(u8_to_bits(value[23])),
+    ...(u8_to_bits(value[24])),
+    ...(u8_to_bits(value[25])),
+    ...(u8_to_bits(value[26])),
+    ...(u8_to_bits(value[27])),
+    ...(u8_to_bits(value[28])),
+    ...(u8_to_bits(value[29])),
+    ...(u8_to_bits(value[30])),
+    ...(u8_to_bits(value[31]))
   ];
   return pack256(bits);
 }
 
 def main<N>(field[N] items) -> field {
-  u64[N * 4] mut converted = [0; N * 4];
+  u8[N * 32] mut converted = [0; N * 32];
   for u32 i in 0..N {
-    u64[4] numbers = fieldToU64(items[i]);
-    converted[4 * i] = numbers[0];
-    converted[4 * i + 1] = numbers[1];
-    converted[4 * i + 2] = numbers[2];
-    converted[4 * i + 3] = numbers[3];
+    u8[32] numbers = fieldToU8(items[i]);
+    converted[32 * i] = numbers[0];
+    converted[32 * i + 1] = numbers[1];
+    converted[32 * i + 2] = numbers[2];
+    converted[32 * i + 3] = numbers[3];
+    converted[32 * i + 4] = numbers[4];
+    converted[32 * i + 5] = numbers[5];
+    converted[32 * i + 6] = numbers[6];
+    converted[32 * i + 7] = numbers[7];
+    converted[32 * i + 8] = numbers[8];
+    converted[32 * i + 9] = numbers[9];
+    converted[32 * i + 10] = numbers[10];
+    converted[32 * i + 11] = numbers[11];
+    converted[32 * i + 12] = numbers[12];
+    converted[32 * i + 13] = numbers[13];
+    converted[32 * i + 14] = numbers[14];
+    converted[32 * i + 15] = numbers[15];
+    converted[32 * i + 16] = numbers[16];
+    converted[32 * i + 17] = numbers[17];
+    converted[32 * i + 18] = numbers[18];
+    converted[32 * i + 19] = numbers[19];
+    converted[32 * i + 20] = numbers[20];
+    converted[32 * i + 21] = numbers[21];
+    converted[32 * i + 22] = numbers[22];
+    converted[32 * i + 23] = numbers[23];
+    converted[32 * i + 24] = numbers[24];
+    converted[32 * i + 25] = numbers[25];
+    converted[32 * i + 26] = numbers[26];
+    converted[32 * i + 27] = numbers[27];
+    converted[32 * i + 28] = numbers[28];
+    converted[32 * i + 29] = numbers[29];
+    converted[32 * i + 30] = numbers[30];
+    converted[32 * i + 31] = numbers[31];
   }
-  u64[4] hash = keccak(converted);
-  return u64ToField(hash);
+  u8[32] hash = keccak(converted);
+  return u8ToField(hash);
 }
 

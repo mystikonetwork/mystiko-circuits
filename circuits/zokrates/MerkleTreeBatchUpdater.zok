@@ -43,8 +43,8 @@ def main<H, R, N>(\
   field newRoot, \
   field leavesHash, \
   field pathIndices, \
-  private field[R] pathElements, \
-  private field[N] leaves) -> bool {
+  field[R] pathElements, \
+  field[N] leaves) -> bool {
   u32 batchHeight = H - R;
   assert(N == (1 << batchHeight));
   assert(leavesHash == LeavesHasher(leaves));
