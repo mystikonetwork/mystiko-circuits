@@ -16,3 +16,5 @@ bash "${BUILDER}" Rollup2
 bash "${BUILDER}" Rollup4
 bash "${BUILDER}" Rollup8
 bash "${BUILDER}" Rollup16
+bash "${BUILDER}" Rollup32
+bash "${BUILDER}" Rollup64
